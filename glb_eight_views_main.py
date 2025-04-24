@@ -196,7 +196,8 @@ def process_model(model_path, output_path=None, resolution=1000, keep_temp=False
     if output_path is None:
         model_dir = os.path.dirname(model_path)
         model_name = os.path.splitext(os.path.basename(model_path))[0]
-        output_path = os.path.join(model_dir, f"{model_name}_eight_views.jpg")
+        output_path = os.path.join(model_dir, f"{model_name}.jpg")
+        # output_path = os.path.join(model_dir, f"{model_name}_eight_views.jpg")
     
     # 渲染八个视图
     view_paths = render_with_blender(model_path, resolution=resolution)
@@ -233,8 +234,8 @@ def process_model(model_path, output_path=None, resolution=1000, keep_temp=False
 
 def main():
     # 解析命令行参数
-    parser = argparse.ArgumentParser(description='渲染GLB模型的八个视图并合并为一个图像')
-    parser.add_argument('model_path', help='GLB模型文件路径')
+    parser = argparse.ArgumentParser(description='渲染3D模型的八个视图并合并为一个图像（支持GLB/GLTF和OBJ格式）')
+    parser.add_argument('model_path', help='3D模型文件路径（支持.glb, .gltf, .obj格式）')
     parser.add_argument('--output', '-o', help='输出图像路径')
     parser.add_argument('--resolution', '-r', type=int, default=1000, help='渲染分辨率')
     parser.add_argument('--keep-temp', '-k', action='store_true', help='保留临时文件')

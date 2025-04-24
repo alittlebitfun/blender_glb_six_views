@@ -53,14 +53,35 @@ class BlenderGLBRenderer:
             bpy.data.images.remove(image)
     
     def import_model(self):
-        """导入GLB/GLTF模型"""
+        """导入3D模型（支持GLB/GLTF和OBJ格式）"""
         print(f"导入模型: {self.model_path}")
         
-        # 导入GLB/GLTF模型
-        if self.model_path.lower().endswith('.glb') or self.model_path.lower().endswith('.gltf'):
+        # 根据文件扩展名选择导入方法
+        file_ext = os.path.splitext(self.model_path)[1].lower()
+        
+        if file_ext == '.glb' or file_ext == '.gltf':
+            # 导入GLB/GLTF模型
             bpy.ops.import_scene.gltf(filepath=self.model_path)
+        elif file_ext == '.obj':
+            # 导入OBJ模型
+            try:
+                # 尝试使用import_mesh.obj
+                bpy.ops.import_mesh.obj(filepath=self.model_path)
+            except Exception as e:
+                print(f"使用import_mesh.obj导入失败: {e}")
+                try:
+                    # 尝试使用import_scene.obj
+                    bpy.ops.import_scene.obj(filepath=self.model_path)
+                except Exception as e:
+                    print(f"使用import_scene.obj导入失败: {e}")
+                    try:
+                        # 尝试使用wm.obj_import
+                        bpy.ops.wm.obj_import(filepath=self.model_path)
+                    except Exception as e:
+                        print(f"使用wm.obj_import导入失败: {e}")
+                        raise ValueError(f"无法导入OBJ文件: {self.model_path}")
         else:
-            raise ValueError(f"不支持的文件格式: {self.model_path}")
+            raise ValueError(f"不支持的文件格式: {self.model_path}，目前支持的格式: .glb, .gltf, .obj")
         
         # 检查是否成功导入
         mesh_objects = [obj for obj in bpy.context.scene.objects if obj.type == 'MESH']
